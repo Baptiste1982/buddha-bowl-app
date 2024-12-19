@@ -1,28 +1,38 @@
 'use client'
-import { useState } from 'react'
-import html2pdf from 'html2pdf.js'
+import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+
+// Importer html2pdf uniquement côté client
+const html2pdf = dynamic(() => import('html2pdf.js'), { ssr: false })
 
 export default function BuddhaBowlFiche() {
   const [selectedImage, setSelectedImage] = useState(null)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
+    if (typeof window !== 'undefined' && e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setSelectedImage(URL.createObjectURL(file))
     }
   }
 
   const generatePDF = () => {
-    const element = document.getElementById('buddha-bowl-fiche')
-    const opt = {
-      margin:       1,
-      filename:     'buddha-bowl-fiche.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-    }
+    if (typeof window !== 'undefined' && isClient) {
+      const element = document.getElementById('buddha-bowl-fiche')
+      const opt = {
+        margin:       1,
+        filename:     'buddha-bowl-fiche.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      }
 
-    html2pdf().set(opt).from(element).save()
+      html2pdf().set(opt).from(element).save()
+    }
   }
 
   return (
@@ -86,7 +96,9 @@ export default function BuddhaBowlFiche() {
           </div>
         </div>
 
+        {/* Le reste de votre code reste exactement le même */}
         <div className="space-y-6">
+          {/* Votre section de temps de réalisation */}
           <section className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold mb-4 text-emerald-800">TEMPS DE RÉALISATION</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -105,10 +117,12 @@ export default function BuddhaBowlFiche() {
             </div>
           </section>
 
+          {/* Votre section process de fabrication */}
           <section className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold mb-4 text-emerald-800">PROCESS DE FABRICATION</h3>
             
             <div className="space-y-4">
+              {/* Votre code existant pour les étapes */}
               {[
                 {
                   title: "1. QUINOA",
@@ -149,6 +163,7 @@ export default function BuddhaBowlFiche() {
             </div>
           </section>
 
+          {/* Votre section contrôle qualité */}
           <section className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold mb-4 text-emerald-800">CONTRÔLE QUALITÉ</h3>
             <div className="grid grid-cols-2 gap-4">
